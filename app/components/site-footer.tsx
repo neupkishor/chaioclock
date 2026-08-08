@@ -13,7 +13,6 @@ export default function SiteFooter() {
         <div>
           <h3 className="font-serif text-lg font-semibold mb-4">Quick Links</h3>
           <nav className="flex flex-col gap-3 text-sm">
-            <Link href="/dishes" className="text-background/60 hover:text-background transition-colors">Dishes</Link>
             <Link href="/shop" className="text-background/60 hover:text-background transition-colors">Shop</Link>
             <Link href="/about" className="text-background/60 hover:text-background transition-colors">About</Link>
             <Link href="/contact" className="text-background/60 hover:text-background transition-colors">Contact</Link>

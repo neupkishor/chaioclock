@@ -1,23 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { menuData } from "./data/menu";
+import { menuData } from "@/menu";
 
 export default function Home() {
   const [teaFilter, setTeaFilter] = useState<string>("all");
   const [snackFilter, setSnackFilter] = useState<string>("all");
+  const [cart, setCart] = useState<{ name: string; description: string; price: number; qty: number }[]>([]);
 
-  const teaItems = menuData.filter((item) => item.tags.includes("tea") || item.tags.includes("milk-base") || item.tags.includes("water-base"));
+  const teaItems = menuData.filter((item) => item.tags.includes("tea") || item.tags.includes("coffee") || item.tags.includes("milk-base") || item.tags.includes("water-base"));
   const snackItems = menuData.filter((item) => item.tags.includes("vegetarian") || item.tags.includes("non-vegetarian"));
 
   const filteredTea = teaFilter === "all" ? teaItems : teaItems.filter((item) => item.tags.includes(teaFilter));
   const filteredSnacks = snackFilter === "all" ? snackItems : snackItems.filter((item) => item.tags.includes(snackFilter));
 
-  const milkBaseItems = filteredTea.filter((item) => item.tags.includes("milk-base"));
-  const waterBaseItems = filteredTea.filter((item) => item.tags.includes("water-base"));
+  const toggleItem = (item: { name: string; description: string; price: number }) => {
+    setCart((prev) => {
+      const existing = prev.find((o) => o.name === item.name);
+      if (existing) {
+        if (existing.qty === 1) return prev.filter((o) => o.name !== item.name);
+        return prev.map((o) => (o.name === item.name ? { ...o, qty: o.qty - 1 } : o));
+      }
+      return [...prev, { ...item, qty: 1 }];
+    });
+  };
 
-  const vegetarianItems = filteredSnacks.filter((item) => item.tags.includes("vegetarian"));
-  const nonVegetarianItems = filteredSnacks.filter((item) => item.tags.includes("non-vegetarian"));
+  const getItemQty = (name: string) => cart.find((o) => o.name === name)?.qty || 0;
 
   return (
     <main className="flex-1">
@@ -58,16 +66,22 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-center mb-16">Our Menu</h2>
 
-          {/* Tea Section */}
+          {/* Tea & Coffee Section */}
           <div className="mb-20">
             <div className="text-center mb-8">
-              <h3 className="font-serif text-3xl md:text-4xl font-bold mb-4">Tea</h3>
+              <h3 className="font-serif text-3xl md:text-4xl font-bold mb-4">Tea & Coffee</h3>
               <p className="text-foreground/70 max-w-2xl mx-auto mb-6">
-                From classic kadak chai to refreshing iced teas, find your perfect brew.
+                From classic kadak chai to refreshing iced teas and strong coffee, find your perfect brew.
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 <button onClick={() => setTeaFilter("all")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "all" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
                   All
+                </button>
+                <button onClick={() => setTeaFilter("tea")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "tea" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Tea
+                </button>
+                <button onClick={() => setTeaFilter("coffee")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "coffee" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Coffee
                 </button>
                 <button onClick={() => setTeaFilter("water-base")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "water-base" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
                   Water Base
@@ -75,40 +89,23 @@ export default function Home() {
                 <button onClick={() => setTeaFilter("milk-base")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "milk-base" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
                   Milk Base
                 </button>
+                <button onClick={() => setTeaFilter("sugar-free")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "sugar-free" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Sugar Free
+                </button>
               </div>
             </div>
 
-            {milkBaseItems.length > 0 && (
-              <div className="mb-12">
-                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Milk Base</h4>
-                <div className="grid md:grid-cols-2 gap-8">
-                  {milkBaseItems.map((item) => (
-                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                      <div className="flex-1 pr-4">
-                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                      </div>
-                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+            {filteredTea.length > 0 && (
+              <div className="grid md:grid-cols-2 gap-8">
+                {filteredTea.map((item) => (
+                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
+                    <div className="flex-1 pr-4">
+                      <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
+                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {waterBaseItems.length > 0 && (
-              <div>
-                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Water Base</h4>
-                <div className="grid md:grid-cols-2 gap-8">
-                  {waterBaseItems.map((item) => (
-                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                      <div className="flex-1 pr-4">
-                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                      </div>
-                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
-                    </div>
-                  ))}
-                </div>
+                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -136,37 +133,17 @@ export default function Home() {
               </div>
             </div>
 
-            {vegetarianItems.length > 0 && (
-              <div className="mb-12">
-                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Vegetarian</h4>
-                <div className="grid md:grid-cols-2 gap-8">
-                  {vegetarianItems.map((item) => (
-                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                      <div className="flex-1 pr-4">
-                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                      </div>
-                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+            {filteredSnacks.length > 0 && (
+              <div className="grid md:grid-cols-2 gap-8">
+                {filteredSnacks.map((item) => (
+                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
+                    <div className="flex-1 pr-4">
+                      <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
+                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {nonVegetarianItems.length > 0 && (
-              <div>
-                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Non-Vegetarian</h4>
-                <div className="grid md:grid-cols-2 gap-8">
-                  {nonVegetarianItems.map((item) => (
-                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                      <div className="flex-1 pr-4">
-                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                      </div>
-                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
-                    </div>
-                  ))}
-                </div>
+                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>

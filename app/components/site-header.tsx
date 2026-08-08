@@ -11,7 +11,6 @@ export default function SiteHeader() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="font-serif text-xl font-bold tracking-tight">Chai O&apos; Clock</Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <Link href="/dishes" className="text-foreground/70 hover:text-accent transition-colors">Dishes</Link>
           <Link href="/shop" className="text-foreground/70 hover:text-accent transition-colors">Shop</Link>
           <Link href="/about" className="text-foreground/70 hover:text-accent transition-colors">About</Link>
           <Link href="/contact" className="text-foreground/70 hover:text-accent transition-colors">Contact</Link>
@@ -37,15 +36,14 @@ export default function SiteHeader() {
       </div>
       {menuOpen && (
         <div className="md:hidden border-t border-foreground/5 bg-background/95 backdrop-blur-md">
-          <nav className="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-4 text-sm font-medium">
-            <Link href="/dishes" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Dishes</Link>
-            <Link href="/shop" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Shop</Link>
-            <Link href="/about" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">About</Link>
-            <Link href="/contact" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Contact</Link>
-            <Link href="/order" onClick={() => setMenuOpen(false)} className="px-4 py-3 bg-foreground text-background rounded-full text-xs text-center hover:bg-accent transition-colors">
-              Order
-            </Link>
-          </nav>
+            <nav className="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-4 text-sm font-medium">
+              <Link href="/shop" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Shop</Link>
+              <Link href="/about" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">About</Link>
+              <Link href="/contact" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Contact</Link>
+              <Link href="/order" onClick={() => setMenuOpen(false)} className="px-4 py-3 bg-foreground text-background rounded-full text-xs text-center hover:bg-accent transition-colors">
+                Order
+              </Link>
+            </nav>
         </div>
       )}
     </header>
