@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/certificates
 
 # next.js
 /.next/
@@ -39,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# neup.standard files
+core
+neup.core
+logica
+neup.logica
