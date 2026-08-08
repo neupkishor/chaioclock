@@ -1,4 +1,31 @@
+import { menuData } from "@/menu";
+
+const tagColors: Record<string, string> = {
+  "tea": "bg-foreground/10 text-foreground/80",
+  "milk-base": "bg-accent/10 text-accent",
+  "water-base": "bg-blue-100 text-blue-800",
+  "vegetarian": "bg-green-100 text-green-800",
+  "non-vegetarian": "bg-red-100 text-red-800",
+  "sugar-free": "bg-purple-100 text-purple-800",
+};
+
+const categories = [
+  { key: "tea", label: "☕ Tea" },
+  { key: "milk-base", label: "🥛 Milk Base" },
+  { key: "water-base", label: "💧 Water Base" },
+  { key: "vegetarian", label: "🌱 Vegetarian Options" },
+  { key: "non-vegetarian", label: "🍗 Non-Vegetarian Options" },
+  { key: "sugar-free", label: "🚫🍬 Sugar-Free Options" },
+];
+
 export default function Dishes() {
+  const getItemsForCategory = (categoryKey: string) => {
+    if (categoryKey === "sugar-free") {
+      return menuData.filter((item) => item.tags.includes("sugar-free"));
+    }
+    return menuData.filter((item) => item.tags.includes(categoryKey));
+  };
+
   return (
     <main className="flex-1">
       <section className="py-24 px-6">
@@ -8,46 +35,55 @@ export default function Dishes() {
             From crispy samosas to warm banana bread, every dish is made fresh to pair perfectly with your chai.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-16">
-            <div>
-              <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-8 text-accent">Savory</h2>
-              <div className="space-y-8">
-                {[
-                  { name: "Samosa", description: "Crispy golden pastry filled with spiced potatoes", price: "₹25" },
-                  { name: "Kachori", description: "Flaky deep-fried snack with dal stuffing", price: "₹20" },
-                  { name: "Paneer Pakora", description: "Cottage cheese fritters with mint chutney", price: "₹70" },
-                  { name: "Medu Vada", description: "Crispy savory donuts with sambar and coconut chutney", price: "₹60" },
-                ].map((item) => (
-                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                    <div className="flex-1 pr-4">
-                      <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
-                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                    </div>
-                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">{item.price}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="space-y-16">
+            {categories.map((category) => {
+              const items = getItemsForCategory(category.key);
+              if (items.length === 0) return null;
 
-            <div>
-              <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-8 text-accent">Sweet</h2>
-              <div className="space-y-8">
-                {[
-                  { name: "Banana Bread", description: "Freshly baked, moist and aromatic", price: "₹90" },
-                  { name: "Chocolate Muffin", description: "Warm, gooey center with dark chocolate chips", price: "₹75" },
-                  { name: "Gulab Jamun", description: "Soft milk-solid dumplings soaked in rose syrup", price: "₹40" },
-                  { name: "Jalebi", description: "Crispy, syrupy spirals served warm", price: "₹35" },
-                ].map((item) => (
-                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                    <div className="flex-1 pr-4">
-                      <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
-                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+              return (
+                <div key={category.key}>
+                  <h2 className="font-serif text-3xl md:text-4xl font-bold mb-8">{category.label}</h2>
+                  {category.key === "sugar-free" && (
+                    <p className="text-foreground/60 text-sm mb-6 max-w-3xl">
+                      The menu doesn&apos;t explicitly label any item as “sugar-free.” However, these drinks can reasonably be offered without added sugar if the café prepares them that way.
+                    </p>
+                  )}
+                  <div className="border border-foreground/10 rounded-2xl overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-foreground/10 bg-foreground/5">
+                            <th className="text-left px-6 py-4 font-semibold text-sm">Item</th>
+                            <th className="text-left px-6 py-4 font-semibold text-sm hidden md:table-cell">Description</th>
+                            <th className="text-right px-6 py-4 font-semibold text-sm">Price (Rs.)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {items.map((item, index) => (
+                            <tr key={item.name} className={`border-b border-foreground/5 last:border-b-0 ${index % 2 === 0 ? "bg-background" : "bg-cream/30"}`}>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium">{item.name}</span>
+                                  <div className="flex flex-wrap gap-1">
+                                    {item.tags.filter((tag) => tag !== category.key).map((tag) => (
+                                      <span key={tag} className={`text-xs px-2 py-0.5 rounded-full ${tagColors[tag] || "bg-foreground/10 text-foreground/70"}`}>
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-foreground/60 text-sm hidden md:table-cell">{item.description}</td>
+                              <td className="text-right px-6 py-4 font-serif text-accent font-semibold">{item.price}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">{item.price}</span>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

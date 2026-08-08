@@ -1,24 +1,24 @@
 "use client";
 
-const menuItems = [
-  { name: "Masala Chai", description: "Traditional spiced tea with cardamom, cinnamon, and ginger", price: "₹60" },
-  { name: "Adrak Chai", description: "Strong ginger tea with a hint of black pepper", price: "₹50" },
-  { name: "Elaichi Chai", description: "Fragrant cardamom-infused milk tea", price: "₹55" },
-  { name: "Cutting Chai", description: "The classic Mumbai-style strong tea, served in a glass", price: "₹30" },
-  { name: "Herbal Infusion", description: "Caffeine-free blend of mint, lemongrass, and tulsi", price: "₹80" },
-  { name: "Chocolate Chai", description: "Rich chocolate with a twist of masala chai", price: "₹90" },
-];
-
-const snacks = [
-  { name: "Samosa", description: "Crispy golden pastry filled with spiced potatoes", price: "₹25" },
-  { name: "Kachori", description: "Flaky deep-fried snack with dal stuffing", price: "₹20" },
-  { name: "Paneer Pakora", description: "Cottage cheese fritters with mint chutney", price: "₹70" },
-  { name: "Medu Vada", description: "Crispy savory donuts with sambar and coconut chutney", price: "₹60" },
-  { name: "Banana Bread", description: "Freshly baked, moist and aromatic", price: "₹90" },
-  { name: "Chocolate Muffin", description: "Warm, gooey center with dark chocolate chips", price: "₹75" },
-];
+import { useState } from "react";
+import { menuData } from "./data/menu";
 
 export default function Home() {
+  const [teaFilter, setTeaFilter] = useState<string>("all");
+  const [snackFilter, setSnackFilter] = useState<string>("all");
+
+  const teaItems = menuData.filter((item) => item.tags.includes("tea") || item.tags.includes("milk-base") || item.tags.includes("water-base"));
+  const snackItems = menuData.filter((item) => item.tags.includes("vegetarian") || item.tags.includes("non-vegetarian"));
+
+  const filteredTea = teaFilter === "all" ? teaItems : teaItems.filter((item) => item.tags.includes(teaFilter));
+  const filteredSnacks = snackFilter === "all" ? snackItems : snackItems.filter((item) => item.tags.includes(snackFilter));
+
+  const milkBaseItems = filteredTea.filter((item) => item.tags.includes("milk-base"));
+  const waterBaseItems = filteredTea.filter((item) => item.tags.includes("water-base"));
+
+  const vegetarianItems = filteredSnacks.filter((item) => item.tags.includes("vegetarian"));
+  const nonVegetarianItems = filteredSnacks.filter((item) => item.tags.includes("non-vegetarian"));
+
   return (
     <main className="flex-1">
       {/* Hero Section */}
@@ -58,38 +58,117 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-center mb-16">Our Menu</h2>
 
-          <div className="grid md:grid-cols-2 gap-16">
-            {/* Teas */}
-            <div>
-              <h3 className="font-serif text-2xl md:text-3xl font-semibold mb-8 text-accent">Teas</h3>
-              <div className="space-y-8">
-                {menuItems.map((item) => (
-                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                    <div className="flex-1 pr-4">
-                      <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                    </div>
-                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">{item.price}</span>
-                  </div>
-                ))}
+          {/* Tea Section */}
+          <div className="mb-20">
+            <div className="text-center mb-8">
+              <h3 className="font-serif text-3xl md:text-4xl font-bold mb-4">Tea</h3>
+              <p className="text-foreground/70 max-w-2xl mx-auto mb-6">
+                From classic kadak chai to refreshing iced teas, find your perfect brew.
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <button onClick={() => setTeaFilter("all")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "all" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  All
+                </button>
+                <button onClick={() => setTeaFilter("water-base")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "water-base" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Water Base
+                </button>
+                <button onClick={() => setTeaFilter("milk-base")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${teaFilter === "milk-base" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Milk Base
+                </button>
               </div>
             </div>
 
-            {/* Snacks */}
-            <div>
-              <h3 className="font-serif text-2xl md:text-3xl font-semibold mb-8 text-accent">Snacks</h3>
-              <div className="space-y-8">
-                {snacks.map((item) => (
-                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                    <div className="flex-1 pr-4">
-                      <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+            {milkBaseItems.length > 0 && (
+              <div className="mb-12">
+                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Milk Base</h4>
+                <div className="grid md:grid-cols-2 gap-8">
+                  {milkBaseItems.map((item) => (
+                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
+                      <div className="flex-1 pr-4">
+                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
+                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                      </div>
+                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
                     </div>
-                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">{item.price}</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {waterBaseItems.length > 0 && (
+              <div>
+                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Water Base</h4>
+                <div className="grid md:grid-cols-2 gap-8">
+                  {waterBaseItems.map((item) => (
+                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
+                      <div className="flex-1 pr-4">
+                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
+                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                      </div>
+                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Snacks Section */}
+          <div>
+            <div className="text-center mb-8">
+              <h3 className="font-serif text-3xl md:text-4xl font-bold mb-4">Snacks</h3>
+              <p className="text-foreground/70 max-w-2xl mx-auto mb-6">
+                Crispy, savory, and freshly made to pair perfectly with your chai.
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <button onClick={() => setSnackFilter("all")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${snackFilter === "all" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  All
+                </button>
+                <button onClick={() => setSnackFilter("vegetarian")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${snackFilter === "vegetarian" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Vegetarian
+                </button>
+                <button onClick={() => setSnackFilter("non-vegetarian")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${snackFilter === "non-vegetarian" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Non-Vegetarian
+                </button>
+                <button onClick={() => setSnackFilter("sugar-free")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${snackFilter === "sugar-free" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                  Sugar-Free
+                </button>
               </div>
             </div>
+
+            {vegetarianItems.length > 0 && (
+              <div className="mb-12">
+                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Vegetarian</h4>
+                <div className="grid md:grid-cols-2 gap-8">
+                  {vegetarianItems.map((item) => (
+                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
+                      <div className="flex-1 pr-4">
+                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
+                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                      </div>
+                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {nonVegetarianItems.length > 0 && (
+              <div>
+                <h4 className="font-serif text-2xl font-semibold mb-6 text-accent">Non-Vegetarian</h4>
+                <div className="grid md:grid-cols-2 gap-8">
+                  {nonVegetarianItems.map((item) => (
+                    <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
+                      <div className="flex-1 pr-4">
+                        <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
+                        <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                      </div>
+                      <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

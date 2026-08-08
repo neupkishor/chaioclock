@@ -1,29 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { menuData } from "@/menu";
 
-const menuItems = [
-  { name: "Masala Chai", description: "Traditional spiced tea with cardamom, cinnamon, and ginger", price: "₹60" },
-  { name: "Adrak Chai", description: "Strong ginger tea with a hint of black pepper", price: "₹50" },
-  { name: "Elaichi Chai", description: "Fragrant cardamom-infused milk tea", price: "₹55" },
-  { name: "Cutting Chai", description: "The classic Mumbai-style strong tea, served in a glass", price: "₹30" },
-  { name: "Herbal Infusion", description: "Caffeine-free blend of mint, lemongrass, and tulsi", price: "₹80" },
-  { name: "Chocolate Chai", description: "Rich chocolate with a twist of masala chai", price: "₹90" },
-];
-
-const snacks = [
-  { name: "Samosa", description: "Crispy golden pastry filled with spiced potatoes", price: "₹25" },
-  { name: "Kachori", description: "Flaky deep-fried snack with dal stuffing", price: "₹20" },
-  { name: "Paneer Pakora", description: "Cottage cheese fritters with mint chutney", price: "₹70" },
-  { name: "Medu Vada", description: "Crispy savory donuts with sambar and coconut chutney", price: "₹60" },
-  { name: "Banana Bread", description: "Freshly baked, moist and aromatic", price: "₹90" },
-  { name: "Chocolate Muffin", description: "Warm, gooey center with dark chocolate chips", price: "₹75" },
-];
+const tagColors: Record<string, string> = {
+  "tea": "bg-foreground/10 text-foreground/80",
+  "milk-base": "bg-accent/10 text-accent",
+  "water-base": "bg-blue-100 text-blue-800",
+  "vegetarian": "bg-green-100 text-green-800",
+  "non-vegetarian": "bg-red-100 text-red-800",
+  "sugar-free": "bg-purple-100 text-purple-800",
+};
 
 export default function Order() {
-  const [order, setOrder] = useState<{ name: string; price: string; qty: number }[]>([]);
+  const [order, setOrder] = useState<{ name: string; description: string; price: number; qty: number }[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  const toggleItem = (item: { name: string; price: string }) => {
+  const toggleItem = (item: { name: string; description: string; price: number }) => {
     setOrder((prev) => {
       const existing = prev.find((o) => o.name === item.name);
       if (existing) {
@@ -34,98 +27,99 @@ export default function Order() {
     });
   };
 
-  const total = order.reduce((sum, item) => sum + parseInt(item.price.replace("₹", "")) * item.qty, 0);
+  const total = order.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+  const filteredItems = activeCategory === "all" 
+    ? menuData 
+    : menuData.filter((item) => item.tags.includes(activeCategory));
 
   return (
     <main className="flex-1">
       <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <h1 className="font-serif text-4xl md:text-5xl font-bold text-center mb-6">Order Online</h1>
           <p className="text-center text-foreground/70 max-w-2xl mx-auto mb-16">
             Build your order below and we&apos;ll have it ready for you.
           </p>
 
-          <div className="grid lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <h2 className="font-serif text-2xl font-semibold mb-6 text-accent">Menu</h2>
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="font-serif text-xl font-semibold mb-4">Teas</h3>
-                  <div className="space-y-4">
-                    {menuItems.map((item) => {
-                      const inOrder = order.find((o) => o.name === item.name);
-                      return (
-                        <div key={item.name} className="flex justify-between items-center border-b border-foreground/10 pb-4">
-                          <div className="flex-1 pr-4">
-                            <h4 className="font-semibold">{item.name}</h4>
-                            <p className="text-foreground/60 text-sm">{item.description}</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="font-serif text-accent">{item.price}</span>
-                            <button onClick={() => toggleItem(item)} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${inOrder ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
-                              {inOrder ? inOrder.qty : "+"}
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-serif text-xl font-semibold mb-4">Snacks</h3>
-                  <div className="space-y-4">
-                    {snacks.map((item) => {
-                      const inOrder = order.find((o) => o.name === item.name);
-                      return (
-                        <div key={item.name} className="flex justify-between items-center border-b border-foreground/10 pb-4">
-                          <div className="flex-1 pr-4">
-                            <h4 className="font-semibold">{item.name}</h4>
-                            <p className="text-foreground/60 text-sm">{item.description}</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="font-serif text-accent">{item.price}</span>
-                            <button onClick={() => toggleItem(item)} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${inOrder ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
-                              {inOrder ? inOrder.qty : "+"}
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="font-serif text-2xl font-semibold mb-6 text-accent">Your Order</h2>
-              <div className="border border-foreground/10 rounded-2xl p-6">
-                {order.length === 0 ? (
-                  <p className="text-foreground/60 text-center py-8">No items added yet</p>
-                ) : (
-                  <>
-                    <div className="space-y-4 mb-6">
-                      {order.map((item) => (
-                        <div key={item.name} className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-sm text-foreground/60">Qty: {item.qty}</p>
-                          </div>
-                          <span className="font-serif text-accent">₹{parseInt(item.price.replace("₹", "")) * item.qty}</span>
-                        </div>
-                      ))}
+          <h2 className="font-serif text-2xl font-semibold mb-6 text-accent">Your Order</h2>
+          <div className="border border-foreground/10 rounded-2xl p-6 mb-8">
+            {order.length === 0 ? (
+              <p className="text-foreground/60 text-center py-8">No items added yet</p>
+            ) : (
+              <>
+                <div className="space-y-4 mb-6">
+                  {order.map((item) => (
+                    <div key={item.name} className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-sm text-foreground/60">{item.description}</p>
+                        <p className="text-sm text-foreground/60">Qty: {item.qty}</p>
+                      </div>
+                      <span className="font-serif text-accent">₹{item.price * item.qty}</span>
                     </div>
-                    <div className="border-t border-foreground/10 pt-4 flex justify-between items-center">
-                      <span className="font-semibold">Total</span>
-                      <span className="font-serif text-xl font-semibold text-accent">₹{total}</span>
+                  ))}
+                </div>
+                <div className="border-t border-foreground/10 pt-4 flex justify-between items-center">
+                  <span className="font-semibold">Total</span>
+                  <span className="font-serif text-xl font-semibold text-accent">₹{total}</span>
+                </div>
+                <button className="w-full mt-6 px-6 py-3 bg-foreground text-background rounded-full text-sm font-medium hover:bg-accent transition-colors">
+                  Place Order
+                </button>
+              </>
+            )}
+          </div>
+
+          <h2 className="font-serif text-2xl font-semibold mb-4 text-accent">Menu</h2>
+          <div className="flex flex-wrap gap-2 mb-6">
+            <button onClick={() => setActiveCategory("all")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === "all" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+              All
+            </button>
+            <button onClick={() => setActiveCategory("milk-base")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === "milk-base" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+              Milk Base
+            </button>
+            <button onClick={() => setActiveCategory("water-base")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === "water-base" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+              Water Base
+            </button>
+            <button onClick={() => setActiveCategory("vegetarian")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === "vegetarian" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+              Vegetarian
+            </button>
+            <button onClick={() => setActiveCategory("non-vegetarian")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === "non-vegetarian" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+              Non-Veg
+            </button>
+            <button onClick={() => setActiveCategory("sugar-free")} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === "sugar-free" ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+              Sugar-Free
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {filteredItems.map((item) => {
+              const inOrder = order.find((o) => o.name === item.name);
+              return (
+                <div key={item.name} className="flex justify-between items-center border-b border-foreground/10 pb-4">
+                  <div className="flex-1 pr-4">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-semibold">{item.name}</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {item.tags.map((tag) => (
+                          <span key={tag} className={`text-xs px-2 py-0.5 rounded-full ${tagColors[tag] || "bg-foreground/10 text-foreground/70"}`}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <button className="w-full mt-6 px-6 py-3 bg-foreground text-background rounded-full text-sm font-medium hover:bg-accent transition-colors">
-                      Place Order
+                    <p className="text-sm text-foreground/60 mt-1">{item.description}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-serif text-accent">₹{item.price}</span>
+                    <button onClick={() => toggleItem(item)} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${inOrder ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                      {inOrder ? inOrder.qty : "+"}
                     </button>
-                  </>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
