@@ -14,14 +14,24 @@ export default function Home() {
   const filteredTea = teaFilter === "all" ? teaItems : teaItems.filter((item) => item.tags.includes(teaFilter));
   const filteredSnacks = snackFilter === "all" ? snackItems : snackItems.filter((item) => item.tags.includes(snackFilter));
 
-  const toggleItem = (item: { name: string; description: string; price: number }) => {
+  const addItem = (item: { name: string; description: string; price: number }) => {
     setCart((prev) => {
       const existing = prev.find((o) => o.name === item.name);
       if (existing) {
-        if (existing.qty === 1) return prev.filter((o) => o.name !== item.name);
-        return prev.map((o) => (o.name === item.name ? { ...o, qty: o.qty - 1 } : o));
+        return prev.map((o) => (o.name === item.name ? { ...o, qty: o.qty + 1 } : o));
       }
       return [...prev, { ...item, qty: 1 }];
+    });
+  };
+
+  const removeItem = (name: string) => {
+    setCart((prev) => {
+      const existing = prev.find((o) => o.name === name);
+      if (existing) {
+        if (existing.qty === 1) return prev.filter((o) => o.name !== name);
+        return prev.map((o) => (o.name === name ? { ...o, qty: o.qty - 1 } : o));
+      }
+      return prev;
     });
   };
 
@@ -95,19 +105,37 @@ export default function Home() {
               </div>
             </div>
 
-            {filteredTea.length > 0 && (
-              <div className="grid md:grid-cols-2 gap-8">
-                {filteredTea.map((item) => (
-                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                    <div className="flex-1 pr-4">
-                      <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                    </div>
-                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+             {filteredTea.length > 0 && (
+               <div className="grid md:grid-cols-2 gap-8">
+                 {filteredTea.map((item) => {
+                   const qty = getItemQty(item.name);
+                   return (
+                     <div key={item.name} className={`flex justify-between items-start border-b pb-6 transition-colors ${qty > 0 ? "border-foreground/40" : "border-foreground/10"}`}>
+                       <div className="flex-1 pr-4">
+                         <h4 className="font-semibold text-lg mb-1">
+                           {item.name}
+                           {qty > 0 && <span className="text-accent ml-2">({qty})</span>}
+                         </h4>
+                         <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                       </div>
+                       <div className="flex flex-col items-end gap-2">
+                         <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                          <div className="flex items-center gap-2">
+                            {qty > 0 ? (
+                              <button onClick={() => removeItem(item.name)} className="w-7 h-7 rounded-full border border-foreground/20 flex items-center justify-center text-sm font-medium hover:border-foreground/40 transition-colors">
+                                -
+                              </button>
+                            ) : null}
+                            <button onClick={() => addItem(item)} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${qty > 0 ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                              +
+                            </button>
+                          </div>
+                       </div>
+                     </div>
+                   );
+                 })}
+               </div>
+             )}
           </div>
 
           {/* Snacks Section */}
@@ -133,19 +161,37 @@ export default function Home() {
               </div>
             </div>
 
-            {filteredSnacks.length > 0 && (
-              <div className="grid md:grid-cols-2 gap-8">
-                {filteredSnacks.map((item) => (
-                  <div key={item.name} className="flex justify-between items-start border-b border-foreground/10 pb-6">
-                    <div className="flex-1 pr-4">
-                      <h4 className="font-semibold text-lg mb-1">{item.name}</h4>
-                      <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                    </div>
-                    <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+             {filteredSnacks.length > 0 && (
+               <div className="grid md:grid-cols-2 gap-8">
+                 {filteredSnacks.map((item) => {
+                   const qty = getItemQty(item.name);
+                   return (
+                     <div key={item.name} className={`flex justify-between items-start border-b pb-6 transition-colors ${qty > 0 ? "border-foreground/40" : "border-foreground/10"}`}>
+                       <div className="flex-1 pr-4">
+                         <h4 className="font-semibold text-lg mb-1">
+                           {item.name}
+                           {qty > 0 && <span className="text-accent ml-2">({qty})</span>}
+                         </h4>
+                         <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                       </div>
+                       <div className="flex flex-col items-end gap-2">
+                         <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                          <div className="flex items-center gap-2">
+                            {qty > 0 ? (
+                              <button onClick={() => removeItem(item.name)} className="w-7 h-7 rounded-full border border-foreground/20 flex items-center justify-center text-sm font-medium hover:border-foreground/40 transition-colors">
+                                -
+                              </button>
+                            ) : null}
+                            <button onClick={() => addItem(item)} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${qty > 0 ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                              +
+                            </button>
+                          </div>
+                       </div>
+                     </div>
+                   );
+                 })}
+               </div>
+             )}
           </div>
         </div>
       </section>
