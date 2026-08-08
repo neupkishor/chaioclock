@@ -27,3 +27,11 @@ body {
     text-wrap: balance;
   }
 }
+
+main > section:nth-child(odd) {
+  background-color: var(--cream);
+}
+
+main > section:nth-child(even) {
+  background-color: var(--background);
+}
