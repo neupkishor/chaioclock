@@ -1,8 +1,4 @@
-
 "use client";
-
-import { useState } from "react";
-import Link from "next/link";
 
 const menuItems = [
   { name: "Masala Chai", description: "Traditional spiced tea with cardamom, cinnamon, and ginger", price: "₹60" },
@@ -23,53 +19,8 @@ const snacks = [
 ];
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
-    <>
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 shadow-md border-b border-foreground/5">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="font-serif text-xl font-bold tracking-tight">Chai O&apos; Clock</Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="/dishes" className="text-foreground/70 hover:text-accent transition-colors">Dishes</Link>
-            <Link href="/shop" className="text-foreground/70 hover:text-accent transition-colors">Shop</Link>
-            <Link href="/about" className="text-foreground/70 hover:text-accent transition-colors">About</Link>
-            <Link href="/contact" className="text-foreground/70 hover:text-accent transition-colors">Contact</Link>
-            <Link href="/order" className="px-4 py-2 bg-foreground text-background rounded-full text-xs hover:bg-accent transition-colors">
-              Order
-            </Link>
-          </nav>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 -mr-2 text-foreground/70 hover:text-accent transition-colors"
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
-        </div>
-        {menuOpen && (
-          <div className="md:hidden border-t border-foreground/5 bg-background/95 backdrop-blur-md">
-            <nav className="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-4 text-sm font-medium">
-              <Link href="/dishes" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Dishes</Link>
-              <Link href="/shop" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Shop</Link>
-              <Link href="/about" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">About</Link>
-              <Link href="/contact" onClick={() => setMenuOpen(false)} className="text-foreground/70 hover:text-accent transition-colors py-2">Contact</Link>
-              <Link href="/order" onClick={() => setMenuOpen(false)} className="px-4 py-3 bg-foreground text-background rounded-full text-xs text-center hover:bg-accent transition-colors">
-                Order
-              </Link>
-            </nav>
-          </div>
-        )}
-      </header>
-      <main className="flex-1">
+    <main className="flex-1">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center px-6">
         <div className="text-center max-w-3xl mx-auto">
@@ -187,42 +138,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-16 px-6 bg-foreground text-background/90 border-t border-foreground/80">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12">
-          <div>
-            <p className="font-serif text-2xl font-semibold mb-4">Chai O&apos; Clock</p>
-            <p className="text-background/60 text-sm leading-relaxed">A cozy corner for handcrafted chai and warm conversations in the heart of Kathmandu.</p>
-          </div>
-          <div>
-            <h3 className="font-serif text-lg font-semibold mb-4">Quick Links</h3>
-            <nav className="flex flex-col gap-3 text-sm">
-              <Link href="/dishes" className="text-background/60 hover:text-background transition-colors">Dishes</Link>
-              <Link href="/shop" className="text-background/60 hover:text-background transition-colors">Shop</Link>
-              <Link href="/about" className="text-background/60 hover:text-background transition-colors">About</Link>
-              <Link href="/contact" className="text-background/60 hover:text-background transition-colors">Contact</Link>
-              <Link href="/order" className="text-background/60 hover:text-background transition-colors">Order</Link>
-            </nav>
-          </div>
-          <div>
-            <h3 className="font-serif text-lg font-semibold mb-4">Visit Us</h3>
-            <div className="text-sm text-background/60 leading-relaxed space-y-2">
-              <p>Bijulibazar Marg, Kathmandu, Nepal</p>
-              <p>Open Daily: 8:30am - 8:30pm</p>
-              <p>hello@chaioclock.in</p>
-              <p>+91 98765 43210</p>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-          <p className="text-background/50">© 2026 Chai O&apos; Clock. Made with love and lots of chai.</p>
-          <p className="text-background/50">
-            Made using <a href="https://neupgroup.com/site" target="_blank" rel="noopener noreferrer" className="text-background/70 hover:text-background underline underline-offset-2 transition-colors">Neup.Site</a> and Proudly Powered by <a href="https://neupgroup.com/tourio" target="_blank" rel="noopener noreferrer" className="text-background/70 hover:text-background underline underline-offset-2 transition-colors">Neup.Tourio</a>
-          </p>
-        </div>
-      </footer>
     </main>
-    </>
   );
 }
