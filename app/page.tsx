@@ -1,12 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { menuData } from "@/menu";
+
+const CART_KEY = "chaioclock-cart";
 
 export default function Home() {
   const [teaFilter, setTeaFilter] = useState<string>("all");
   const [snackFilter, setSnackFilter] = useState<string>("all");
+  const [mounted, setMounted] = useState(false);
   const [cart, setCart] = useState<{ name: string; description: string; price: number; qty: number }[]>([]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    try {
+      const stored = localStorage.getItem(CART_KEY);
+      if (stored) setCart(JSON.parse(stored));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch {}
+  }, [cart, mounted]);
 
   const teaItems = menuData.filter((item) => item.tags.includes("tea") || item.tags.includes("coffee") || item.tags.includes("milk-base") || item.tags.includes("water-base"));
   const snackItems = menuData.filter((item) => item.tags.includes("vegetarian") || item.tags.includes("non-vegetarian"));
@@ -110,28 +129,28 @@ export default function Home() {
                  {filteredTea.map((item) => {
                    const qty = getItemQty(item.name);
                    return (
-                     <div key={item.name} className={`flex justify-between items-start border-b pb-6 transition-colors ${qty > 0 ? "border-foreground/40" : "border-foreground/10"}`}>
-                       <div className="flex-1 pr-4">
-                         <h4 className="font-semibold text-lg mb-1">
-                           {item.name}
-                           {qty > 0 && <span className="text-accent ml-2">({qty})</span>}
-                         </h4>
-                         <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                       </div>
-                       <div className="flex flex-col items-end gap-2">
-                         <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                      <div key={item.name} className={`flex justify-between items-start border-b pb-6 transition-colors ${mounted && qty > 0 ? "border-foreground/40" : "border-foreground/10"}`}>
+                        <div className="flex-1 pr-4">
+                          <h4 className="font-semibold text-lg mb-1">
+                            {item.name}
+                            {mounted && qty > 0 && <span className="text-accent ml-2">({qty})</span>}
+                          </h4>
+                          <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
                           <div className="flex items-center gap-2">
-                            {qty > 0 ? (
+                            {mounted && qty > 0 ? (
                               <button onClick={() => removeItem(item.name)} className="w-7 h-7 rounded-full border border-foreground/20 flex items-center justify-center text-sm font-medium hover:border-foreground/40 transition-colors">
                                 -
                               </button>
                             ) : null}
-                            <button onClick={() => addItem(item)} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${qty > 0 ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                            <button onClick={() => addItem(item)} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${mounted && qty > 0 ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
                               +
                             </button>
                           </div>
-                       </div>
-                     </div>
+                        </div>
+                      </div>
                    );
                  })}
                </div>
@@ -166,28 +185,28 @@ export default function Home() {
                  {filteredSnacks.map((item) => {
                    const qty = getItemQty(item.name);
                    return (
-                     <div key={item.name} className={`flex justify-between items-start border-b pb-6 transition-colors ${qty > 0 ? "border-foreground/40" : "border-foreground/10"}`}>
-                       <div className="flex-1 pr-4">
-                         <h4 className="font-semibold text-lg mb-1">
-                           {item.name}
-                           {qty > 0 && <span className="text-accent ml-2">({qty})</span>}
-                         </h4>
-                         <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
-                       </div>
-                       <div className="flex flex-col items-end gap-2">
-                         <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
+                      <div key={item.name} className={`flex justify-between items-start border-b pb-6 transition-colors ${mounted && qty > 0 ? "border-foreground/40" : "border-foreground/10"}`}>
+                        <div className="flex-1 pr-4">
+                          <h4 className="font-semibold text-lg mb-1">
+                            {item.name}
+                            {mounted && qty > 0 && <span className="text-accent ml-2">({qty})</span>}
+                          </h4>
+                          <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <span className="font-serif text-lg font-semibold text-accent whitespace-nowrap">₹{item.price}</span>
                           <div className="flex items-center gap-2">
-                            {qty > 0 ? (
+                            {mounted && qty > 0 ? (
                               <button onClick={() => removeItem(item.name)} className="w-7 h-7 rounded-full border border-foreground/20 flex items-center justify-center text-sm font-medium hover:border-foreground/40 transition-colors">
                                 -
                               </button>
                             ) : null}
-                            <button onClick={() => addItem(item)} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${qty > 0 ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                            <button onClick={() => addItem(item)} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${mounted && qty > 0 ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
                               +
                             </button>
                           </div>
-                       </div>
-                     </div>
+                        </div>
+                      </div>
                    );
                  })}
                </div>

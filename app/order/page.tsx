@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { menuData } from "@/menu";
+
+const CART_KEY = "chaioclock-cart";
 
 const tagColors: Record<string, string> = {
   "tea": "bg-foreground/10 text-foreground/80",
@@ -13,24 +15,51 @@ const tagColors: Record<string, string> = {
 };
 
 export default function Order() {
-  const [order, setOrder] = useState<{ name: string; description: string; price: number; qty: number }[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [mounted, setMounted] = useState(false);
+  const [cart, setCart] = useState<{ name: string; description: string; price: number; qty: number }[]>([]);
 
-  const toggleItem = (item: { name: string; description: string; price: number }) => {
-    setOrder((prev) => {
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    try {
+      const stored = localStorage.getItem(CART_KEY);
+      if (stored) setCart(JSON.parse(stored));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch {}
+  }, [cart, mounted]);
+
+  const addItem = (item: { name: string; description: string; price: number }) => {
+    setCart((prev) => {
       const existing = prev.find((o) => o.name === item.name);
       if (existing) {
-        if (existing.qty === 1) return prev.filter((o) => o.name !== item.name);
-        return prev.map((o) => (o.name === item.name ? { ...o, qty: o.qty - 1 } : o));
+        return prev.map((o) => (o.name === item.name ? { ...o, qty: o.qty + 1 } : o));
       }
       return [...prev, { ...item, qty: 1 }];
     });
   };
 
-  const total = order.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const removeItem = (name: string) => {
+    setCart((prev) => {
+      const existing = prev.find((o) => o.name === name);
+      if (existing) {
+        if (existing.qty === 1) return prev.filter((o) => o.name !== name);
+        return prev.map((o) => (o.name === name ? { ...o, qty: o.qty - 1 } : o));
+      }
+      return prev;
+    });
+  };
 
-  const filteredItems = activeCategory === "all" 
-    ? menuData 
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+  const filteredItems = activeCategory === "all"
+    ? menuData
     : menuData.filter((item) => item.tags.includes(activeCategory));
 
   return (
@@ -44,12 +73,12 @@ export default function Order() {
 
           <h2 className="font-serif text-2xl font-semibold mb-6 text-accent">Your Order</h2>
           <div className="border border-foreground/10 rounded-2xl p-6 mb-8">
-            {order.length === 0 ? (
+            {cart.length === 0 ? (
               <p className="text-foreground/60 text-center py-8">No items added yet</p>
             ) : (
               <>
                 <div className="space-y-4 mb-6">
-                  {order.map((item) => (
+                  {cart.map((item) => (
                     <div key={item.name} className="flex justify-between items-start">
                       <div>
                         <p className="font-medium">{item.name}</p>
@@ -95,7 +124,8 @@ export default function Order() {
 
           <div className="space-y-4">
             {filteredItems.map((item) => {
-              const inOrder = order.find((o) => o.name === item.name);
+              const inCart = cart.find((o) => o.name === item.name);
+              const qty = inCart?.qty || 0;
               return (
                 <div key={item.name} className="flex justify-between items-center border-b border-foreground/10 pb-4">
                   <div className="flex-1 pr-4">
@@ -111,10 +141,14 @@ export default function Order() {
                     </div>
                     <p className="text-sm text-foreground/60 mt-1">{item.description}</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-serif text-accent">₹{item.price}</span>
-                    <button onClick={() => toggleItem(item)} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${inOrder ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
-                      {inOrder ? inOrder.qty : "+"}
+                  <div className="flex items-center gap-2">
+                    {mounted && qty > 0 && (
+                      <button onClick={() => removeItem(item.name)} className="w-8 h-8 rounded-full border border-foreground/20 flex items-center justify-center text-sm font-medium hover:border-foreground/40 transition-colors">
+                        -
+                      </button>
+                    )}
+                    <button onClick={() => addItem(item)} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${mounted && qty > 0 ? "bg-foreground text-background" : "border border-foreground/20 hover:border-foreground/40"}`}>
+                      {mounted && qty > 0 ? qty : "+"}
                     </button>
                   </div>
                 </div>
